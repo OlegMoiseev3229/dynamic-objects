@@ -142,7 +142,7 @@ char* dyn_to_string(Dyn_Value v) {
 	} else if (v.t == Dyn_OBJECT) {
 		return "Dyn_OBJECT";
 	} else if (v.t == Dyn_NUMBER) {
-		char* s = dyn_get_memory(10);
+		char* s = dyn_get_memory(11);
 		snprintf(s, 10, "%7.2f", v.n);
 		return s;
 	} else {
