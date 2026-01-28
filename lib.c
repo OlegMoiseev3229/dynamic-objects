@@ -5,6 +5,7 @@ typedef struct {
 	int offset;
 	int size;
 	int need_to_free;
+	int initialized;
 } Dyn_Arena;
 
 typedef enum {
@@ -51,7 +52,7 @@ int dyn_has_type(Dyn_Object* o, const char* name, Dyn_ValueType t);
 #define dyn_object(...) (dyn_object_(0, __VA_ARGS__, NULL))
 Dyn_Object dyn_object_(int n, ...);
 
-#ifdef __DYN_IMPLEMENTATION__
+#ifdef DYN_IMPLEMENTATION
 #include<stdarg.h>
 #include<stdlib.h>
 #include<stdio.h>
@@ -78,12 +79,14 @@ void dyn_free_all() {
 
 void dyn_delete_arena () {
 	free(arena.data);
-	arena.size = 0;
-	arena.offset = 0;
-	arena.data = NULL;
 }
 
 void dyn_init(int memory_size, void* memory_buffer) {
+	if (arena.initialized) {
+		fprintf(stderr, "Warning: dynamic array library initialized twice") {
+			return;
+		}
+	}
 	if (!memory_buffer) {
 		dyn_create_arena(memory_size);
 	} else {
@@ -94,11 +97,12 @@ void dyn_init(int memory_size, void* memory_buffer) {
 void dyn_deinit() {
 	if (arena.need_to_free) {
 		dyn_delete_arena();
-	} else {
-		arena.size = 0;
-		arena.offset = 0;
-		arena.data = NULL;
 	}
+	arena.size = 0;
+	arena.offset = 0;
+	arena.data = NULL;
+	arena.need_to_free = 0;
+	arena.initialized = 0;
 }
 
 Dyn_Value dyn_number(double n) {
