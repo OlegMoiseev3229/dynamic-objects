@@ -1,5 +1,8 @@
-#define __DYN_IMPLEMENTATION__
+#define DYN_IMPLEMENTATION
 #include "lib.c"
+
+#include<stdio.h>
+#include<stdlib.h>
 
 void foo(Dyn_Object* description) {
 	if (dyn_eq(dyn_get(description, "func"), dyn_string("print"))) {

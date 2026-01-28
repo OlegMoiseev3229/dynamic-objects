@@ -63,6 +63,14 @@ void dyn_create_arena(int size) {
 }
 
 void* dyn_get_memory(int bytes) {
+	if (!arena.initialized) {
+		fprintf(stderr, "Error: trying to allocate a dynamic object without initializing the library\n");
+		return NULL;
+	}
+	if (arena.data == NULL) {
+		fprintf(stderr, "Error: Arena in dynamic array library is NULL.\n");
+		return NULL;
+	}
 	void* res = arena.data + arena.offset;
 	arena.offset += bytes;
 	if (arena.offset >= arena.size) {
@@ -83,18 +91,22 @@ void dyn_delete_arena () {
 
 void dyn_init(int memory_size, void* memory_buffer) {
 	if (arena.initialized) {
-		fprintf(stderr, "Warning: dynamic array library initialized twice") {
-			return;
-		}
+		fprintf(stderr, "Warning: dynamic array library initialized twice\n") ;
+		return;
 	}
 	if (!memory_buffer) {
 		dyn_create_arena(memory_size);
 	} else {
 		arena = (Dyn_Arena) {.data=memory_buffer, .size=memory_size};
 	}
+	arena.initialized = 1;
 }
 
 void dyn_deinit() {
+	if (!arena.initialized) {
+		fprintf(stderr, "Warning: trying to deinit a non initialized dynamic array library\n");
+		return;
+	}
 	if (arena.need_to_free) {
 		dyn_delete_arena();
 	}
